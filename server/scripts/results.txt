@@ -1,0 +1,11 @@
+--- CONNECTION SUCCESSFUL ---
+Database Name: campus-management
+Host: localhost
+Collections: [
+  "projects",
+  "users",
+  "evaluations",
+  "reservations",
+  "bookings",
+  "applications"
+]
