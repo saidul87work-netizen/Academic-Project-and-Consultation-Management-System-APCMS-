@@ -1,0 +1,13 @@
+# Ignore local environment files
+server/.env
+client/.env
+*.env
+
+# Ignore node modules directories
+server/node_modules/
+client/node_modules/
+
+# Ignore logs
+npm-debug.log*
+yarn-debug.log*
+
