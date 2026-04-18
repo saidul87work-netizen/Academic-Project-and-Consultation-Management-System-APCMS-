@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderKanban, Calendar, Users, FileText, Settings, Briefcase } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Calendar, Users, FileText, Settings, Briefcase, UserCheck, Clock } from 'lucide-react';
 import type { PageView, UserRole } from '../App';
 
 interface SidebarProps {
@@ -46,6 +46,18 @@ export function Sidebar({ currentPage, userRole, onNavigate }: SidebarProps) {
       icon: <Users className="w-5 h-5" />,
       roles: ['admin'],
     },
+    {
+      id: 'supervisor-management',
+      label: 'Assign Supervisors',
+      icon: <UserCheck className="w-5 h-5" />,
+      roles: ['admin'],
+    },
+    {
+      id: 'supervisor-availability',
+      label: 'My Availability',
+      icon: <Clock className="w-5 h-5" />,
+      roles: ['faculty'],
+    },
   ];
 
   const filteredNavItems = navItems.filter((item) => item.roles.includes(userRole));
@@ -74,14 +86,17 @@ export function Sidebar({ currentPage, userRole, onNavigate }: SidebarProps) {
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
-                currentPage === item.id || (currentPage === 'project-details' && item.id === 'projects')
+                currentPage === item.id ||
+                (currentPage === 'project-details' && item.id === 'projects') ||
+                (currentPage === 'supervisor-management' && item.id === 'supervisor-management') ||
+                (currentPage === 'supervisor-availability' && item.id === 'supervisor-availability')
                   ? 'bg-purple-600/30 text-purple-100 border-l-4 border-purple-400 shadow-lg'
                   : 'text-purple-200 hover:bg-purple-700/20 hover:text-white hover:shadow-md'
               }`}
               style={{
                 filter: currentPage === item.id || (currentPage === 'project-details' && item.id === 'projects')
                   ? 'brightness(1.2)'
-                  : 'brightness(0.9)'
+                  : 'brightness(0.9)',
               }}
             >
               {item.icon}

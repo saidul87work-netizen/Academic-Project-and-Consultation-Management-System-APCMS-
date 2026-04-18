@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { Sidebar } from "./components/Sidebar";
-import { Dashboard } from "./components/Dashboard";
+import { StudentDashboard } from "./components/StudentDashboard";
+import { FacultyDashboard } from "./components/FacultyDashboard";
+import { AdminDashboard } from "./components/AdminDashboard";
+import { SupervisorManagement } from "./components/SupervisorManagement";
+import { SupervisorAvailability } from "./components/SupervisorAvailability";
 import { ProjectsList } from "./components/ProjectsList";
 import { ProjectDetails } from "./components/ProjectDetails";
 import { DeskReservation } from "./components/DeskReservation";
@@ -8,6 +12,7 @@ import { LabAvailability } from "./components/LabAvailability";
 import { MeetingRoomReservation } from "./components/MeetingRoomReservation";
 import { Reservation } from "./components/Reservation";
 import { MyReservations } from "./components/MyReservations";
+import { UserManagement } from "./components/UserManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
@@ -69,7 +74,7 @@ export interface Reservation {
   purpose: string;
 }
 
-export type PageView = "dashboard" | "projects" | "project-details" | "reservations" | "positions" | "users";
+export type PageView = "dashboard" | "projects" | "project-details" | "reservations" | "positions" | "users" | "supervisor-management" | "supervisor-availability";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageView>("dashboard");
@@ -366,13 +371,28 @@ export default function App() {
         </header>
 
         <main className="flex-1 p-6 w-full max-w-full">
-          {currentPage === "dashboard" && (
-            <Dashboard
-              userRole={userRole}
-              onNavigate={handleNavigate}
-              onViewProject={handleViewProject}
+          {currentPage === "dashboard" && userRole === "student" && (
+            <StudentDashboard
               projects={projects}
               evaluations={evaluations}
+              onNavigate={handleNavigate}
+              onViewProject={handleViewProject}
+            />
+          )}
+          {currentPage === "dashboard" && userRole === "faculty" && (
+            <FacultyDashboard
+              projects={projects}
+              evaluations={evaluations}
+              onNavigate={handleNavigate}
+              onViewProject={handleViewProject}
+            />
+          )}
+          {currentPage === "dashboard" && userRole === "admin" && (
+            <AdminDashboard
+              projects={projects}
+              evaluations={evaluations}
+              onNavigate={handleNavigate}
+              onViewProject={handleViewProject}
             />
           )}
           {currentPage === "projects" && (
@@ -407,6 +427,14 @@ export default function App() {
             />
           )}
           {currentPage === "reservations" && renderReservations()}
+          {currentPage === "users" && <UserManagement />}
+          {currentPage === "supervisor-management" && (
+            <SupervisorManagement
+              projects={projects}
+              onProjectsUpdated={refreshMyProjects}
+            />
+          )}
+          {currentPage === "supervisor-availability" && <SupervisorAvailability />}
           {currentPage === "positions" && (
             <PositionApplications
               userRole={userRole}
