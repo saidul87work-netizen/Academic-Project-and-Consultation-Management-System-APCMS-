@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderKanban, Calendar, Users, FileText, Settings, Briefcase, UserCheck, Clock } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Calendar, Users, FileText, Settings, Briefcase, UserCheck, Clock, CalendarDays, UserCircle } from 'lucide-react';
 import type { PageView, UserRole } from '../App';
 
 interface SidebarProps {
@@ -20,25 +20,31 @@ export function Sidebar({ currentPage, userRole, onNavigate }: SidebarProps) {
       id: 'dashboard',
       label: 'Dashboard',
       icon: <LayoutDashboard className="w-5 h-5" />,
-      roles: ['admin', 'faculty', 'student'],
+      roles: ['admin', 'faculty', 'student', 'ta'],
     },
     {
       id: 'projects',
       label: 'Project Evaluations',
       icon: <FolderKanban className="w-5 h-5" />,
-      roles: ['admin', 'faculty', 'student'],
+      roles: ['admin', 'faculty', 'student', 'ta'],
     },
     {
       id: 'reservations',
       label: 'Room & Desk Booking',
       icon: <Calendar className="w-5 h-5" />,
-      roles: ['admin', 'faculty', 'student'],
+      roles: ['admin', 'faculty', 'student', 'ta'],
     },
     {
       id: 'positions',
       label: 'Positions & Applications',
       icon: <Briefcase className="w-5 h-5" />,
-      roles: ['admin', 'faculty', 'student'],
+      roles: ['admin', 'faculty', 'student', 'ta'],
+    },
+    {
+      id: 'calendar',
+      label: 'Calendar Integration',
+      icon: <CalendarDays className="w-5 h-5" />,
+      roles: ['admin', 'faculty', 'student', 'ta'],
     },
     {
       id: 'users',
@@ -87,17 +93,10 @@ export function Sidebar({ currentPage, userRole, onNavigate }: SidebarProps) {
               onClick={() => onNavigate(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                 currentPage === item.id ||
-                (currentPage === 'project-details' && item.id === 'projects') ||
-                (currentPage === 'supervisor-management' && item.id === 'supervisor-management') ||
-                (currentPage === 'supervisor-availability' && item.id === 'supervisor-availability')
+                (currentPage === 'project-details' && item.id === 'projects')
                   ? 'bg-purple-600/30 text-purple-100 border-l-4 border-purple-400 shadow-lg'
                   : 'text-purple-200 hover:bg-purple-700/20 hover:text-white hover:shadow-md'
               }`}
-              style={{
-                filter: currentPage === item.id || (currentPage === 'project-details' && item.id === 'projects')
-                  ? 'brightness(1.2)'
-                  : 'brightness(0.9)',
-              }}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -107,10 +106,21 @@ export function Sidebar({ currentPage, userRole, onNavigate }: SidebarProps) {
 
         {/* Secondary Menu */}
         <div className="mt-8 space-y-1">
-          <p className="px-3 py-2 text-xs text-purple-300 uppercase tracking-wider font-semibold">System</p>
+          <p className="px-3 py-2 text-xs text-purple-300 uppercase tracking-wider font-semibold">Account</p>
+          <button
+            onClick={() => onNavigate('profile')}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+              currentPage === 'profile'
+                ? 'bg-purple-600/30 text-purple-100 border-l-4 border-purple-400 shadow-lg'
+                : 'text-purple-200 hover:bg-purple-700/20 hover:text-white hover:shadow-md'
+            }`}
+          >
+            <UserCircle className="w-5 h-5" />
+            <span>Profile &amp; Settings</span>
+          </button>
           <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-purple-200 hover:bg-purple-700/20 hover:text-white transition-all duration-200 hover:shadow-md">
             <Settings className="w-5 h-5" />
-            <span>Settings</span>
+            <span>Preferences</span>
           </button>
         </div>
       </nav>

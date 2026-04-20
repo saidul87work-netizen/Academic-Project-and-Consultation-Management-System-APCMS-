@@ -20,10 +20,12 @@ import { projectApi } from "./services/projectService";
 import { evaluationApi } from "./services/evaluationApi";
 import { applicationApi } from "./services/positionApi";
 import { PositionApplications } from "./components/PositionApplications";
-import { BookOpen, Briefcase, Building, Calendar, MonitorSmartphone, Users, LogOut } from "lucide-react";
-import { ModeToggle } from "./components/mode-toggle";
+import { BookOpen, Briefcase, Building, Calendar, MonitorSmartphone, Users } from "lucide-react";
+import { TopBar } from "./components/TopBar";
+import { CalendarIntegration } from "./components/CalendarIntegration";
+import { ProfileSettings } from "./components/ProfileSettings";
 
-export type UserRole = "admin" | "faculty" | "student";
+export type UserRole = "admin" | "faculty" | "student" | "ta";
 export type AssessorRole = "Supervisor" | "Co-Supervisor" | "ST" | "RA" | "TA" | "External Examiner";
 export type EvaluationStatus = "Pending" | "Submitted";
 
@@ -74,7 +76,7 @@ export interface Reservation {
   purpose: string;
 }
 
-export type PageView = "dashboard" | "projects" | "project-details" | "reservations" | "positions" | "users" | "supervisor-management" | "supervisor-availability";
+export type PageView = "dashboard" | "projects" | "project-details" | "reservations" | "positions" | "users" | "supervisor-management" | "supervisor-availability" | "calendar" | "profile";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageView>("dashboard");
@@ -325,50 +327,12 @@ export default function App() {
       <Sidebar currentPage={currentPage} userRole={userRole} onNavigate={handleNavigate} />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-gray-900">Campus Management System</h1>
-                <p className="text-gray-600 text-sm mt-1">
-                  Academic Project Management
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm">
-                      {userRole === "admin" ? "AD" : userRole === "faculty" ? "FA" : "ST"}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-900 dark:text-gray-100">
-                      {userRole === "admin" ? "Admin" : userRole === "faculty" ? "Faculty" : "Student"}
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 capitalize">{userRole}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <ModeToggle />
-                  <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
-                  {(['student', 'faculty', 'admin'] as UserRole[]).map((role) => (
-                    <button
-                      key={role}
-                      onClick={() => handleRoleChange(role)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                        userRole === role
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
-                      }`}
-                    >
-                      {role === 'admin' ? 'Admin' : role === 'faculty' ? 'Faculty' : 'Student'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
+        <TopBar
+          currentPage={currentPage}
+          userRole={userRole}
+          onRoleChange={handleRoleChange}
+          onNavigate={handleNavigate}
+        />
 
         <main className="flex-1 p-6 w-full max-w-full">
           {currentPage === "dashboard" && userRole === "student" && (
@@ -389,6 +353,14 @@ export default function App() {
           )}
           {currentPage === "dashboard" && userRole === "admin" && (
             <AdminDashboard
+              projects={projects}
+              evaluations={evaluations}
+              onNavigate={handleNavigate}
+              onViewProject={handleViewProject}
+            />
+          )}
+          {currentPage === "dashboard" && userRole === "ta" && (
+            <StudentDashboard
               projects={projects}
               evaluations={evaluations}
               onNavigate={handleNavigate}
@@ -435,6 +407,8 @@ export default function App() {
             />
           )}
           {currentPage === "supervisor-availability" && <SupervisorAvailability />}
+          {currentPage === "calendar" && <CalendarIntegration />}
+          {currentPage === "profile" && <ProfileSettings userRole={userRole} />}
           {currentPage === "positions" && (
             <PositionApplications
               userRole={userRole}
