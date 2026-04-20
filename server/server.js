@@ -100,6 +100,8 @@ import projectRoutes from "./routes/projects.js";
 import evaluationRoutes from "./routes/evaluations.js";
 import bookingRoutes from "./routes/bookings.js";
 import positionRoutes from "./routes/positions.js";
+import consultationRoutes from "./routes/consultationRoutes.js";
+import reservationRoutes from "./routes/reservations.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -133,6 +135,8 @@ app.use("/api/projects", projectRoutes);
 app.use('/api/evaluations', evaluationRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/positions', positionRoutes);
+app.use('/api/consultations', consultationRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 const startServer = async () => {
   try {

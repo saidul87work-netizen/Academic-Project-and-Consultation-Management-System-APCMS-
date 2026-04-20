@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const reservationSchema = new mongoose.Schema({
   userId: {
@@ -73,4 +73,4 @@ reservationSchema.pre('save', function(next) {
   next();
 });
 
-module.exports = mongoose.model('Reservation', reservationSchema);
+export default mongoose.models.Reservation || mongoose.model('Reservation', reservationSchema);

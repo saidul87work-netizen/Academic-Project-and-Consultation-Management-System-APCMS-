@@ -335,20 +335,20 @@ const ResourceSchema = new Schema({
 /**
  * Model exports
  */
-const User = model('User', UserSchema);
-const Project = model('Project', ProjectSchema);
-const Reservation = model('Reservation', ReservationSchema);
-const SupervisorAssignment = model('SupervisorAssignment', SupervisorAssignmentSchema);
-const Application = model('Application', ApplicationSchema);
-const ConsultationRequest = model('ConsultationRequest', ConsultationRequestSchema);
-const Evaluation = model('Evaluation', EvaluationSchema);
-const AuditLog = model('AuditLog', AuditLogSchema);
-const GroupPost = model('GroupPost', GroupPostSchema);
-const Conversation = model('Conversation', ConversationSchema);
-const Message = model('Message', MessageSchema);
-const Notification = model('Notification', NotificationSchema);
-const QRLocation = model('QRLocation', QRLocationSchema);
-const Resource = model('Resource', ResourceSchema);
+const User = mongoose.models.User || model('User', UserSchema);
+const Project = mongoose.models.Project || model('Project', ProjectSchema);
+const Reservation = mongoose.models.Reservation || model('Reservation', ReservationSchema);
+const SupervisorAssignment = mongoose.models.SupervisorAssignment || model('SupervisorAssignment', SupervisorAssignmentSchema);
+const Application = mongoose.models.Application || model('Application', ApplicationSchema);
+const ConsultationRequest = mongoose.models.ConsultationRequest || model('ConsultationRequest', ConsultationRequestSchema);
+const Evaluation = mongoose.models.Evaluation || model('Evaluation', EvaluationSchema);
+const AuditLog = mongoose.models.AuditLog || model('AuditLog', AuditLogSchema);
+const GroupPost = mongoose.models.GroupPost || model('GroupPost', GroupPostSchema);
+const Conversation = mongoose.models.Conversation || model('Conversation', ConversationSchema);
+const Message = mongoose.models.Message || model('Message', MessageSchema);
+const Notification = mongoose.models.Notification || model('Notification', NotificationSchema);
+const QRLocation = mongoose.models.QRLocation || model('QRLocation', QRLocationSchema);
+const Resource = mongoose.models.Resource || model('Resource', ResourceSchema);
 
 export {
   User, Project, Reservation, SupervisorAssignment, Application,

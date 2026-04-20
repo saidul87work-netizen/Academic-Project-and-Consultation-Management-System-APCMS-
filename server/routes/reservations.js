@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
+import Reservation from '../models/Reservation.js';
+import { authenticate as protect, authorize } from '../middleware/auth.js';
+
 const router = express.Router();
-const Reservation = require('../models/Reservation');
-const { protect, authorize } = require('../middleware/auth');
 
 // @route   GET /api/reservations
 // @desc    Get all reservations (with filters)
@@ -261,4 +262,4 @@ router.get('/check-availability', protect, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
