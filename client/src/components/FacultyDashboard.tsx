@@ -60,8 +60,8 @@ export function FacultyDashboard({ projects, evaluations, onNavigate, onViewProj
     <div className="space-y-6">
       {/* Welcome Banner */}
       <div className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 p-6 text-white">
-        <h2 className="text-2xl font-bold">Welcome, Faculty!</h2>
-        <p className="mt-1 text-emerald-100">
+        <h2 className="text-2xl font-bold text-foreground">Welcome, Faculty!</h2>
+        <p className="mt-1 text-foreground">
           {pendingEvals.length > 0
             ? `You have ${pendingEvals.length} evaluation${pendingEvals.length !== 1 ? "s" : ""} waiting for your review.`
             : "All your evaluations are up to date. Great work!"}

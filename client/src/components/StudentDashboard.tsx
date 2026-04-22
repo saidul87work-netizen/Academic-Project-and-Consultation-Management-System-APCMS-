@@ -61,8 +61,8 @@ export function StudentDashboard({ projects, evaluations, onNavigate, onViewProj
     <div className="space-y-6">
       {/* Welcome Banner */}
       <div className="rounded-xl bg-gradient-to-r from-blue-600 to-blue-400 p-6 text-white">
-        <h2 className="text-2xl font-bold">Welcome back, Student!</h2>
-        <p className="mt-1 text-blue-100">
+        <h2 className="text-2xl font-bold text-foreground">Welcome back, Student!</h2>
+        <p className="mt-1 text-foreground">
           You have {pendingEvals.length} pending evaluation{pendingEvals.length !== 1 ? "s" : ""} and {myProjects.length} active project{myProjects.length !== 1 ? "s" : ""}.
         </p>
       </div>

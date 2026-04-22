@@ -60,8 +60,8 @@ export function AdminDashboard({ projects, evaluations, onNavigate, onViewProjec
         <div className="flex items-center gap-3">
           <ShieldCheck className="size-8 text-slate-300" />
           <div>
-            <h2 className="text-2xl font-bold">Admin Dashboard</h2>
-            <p className="mt-1 text-slate-300">
+            <h2 className="text-2xl font-bold text-foreground">Admin Dashboard</h2>
+            <p className="mt-1 text-foreground">
               {MOCK_STATS.pendingApprovals} pending approval{MOCK_STATS.pendingApprovals !== 1 ? "s" : ""} · {pendingEvals.length} evaluations awaiting review
             </p>
           </div>
