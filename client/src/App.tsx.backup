@@ -1,0 +1,594 @@
+import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+import { DeskReservation } from "./components/DeskReservation";
+import { LabAvailability } from "./components/LabAvailability";
+import { MeetingRoomReservation } from "./components/MeetingRoomReservation";
+import { Reservation } from "./components/Reservation";
+import { MyReservations } from "./components/MyReservations";
+import { PositionApplications } from "./components/PositionApplications";
+import { Sidebar } from "./components/Sidebar";
+import { Dashboard } from "./components/Dashboard";
+import { ProjectsList } from "./components/ProjectsList";
+import { ProjectDetails } from "./components/ProjectDetails";
+import { Login } from "./components/Login";
+import { BookOpen, Briefcase, Building, Calendar, MonitorSmartphone, Users, LogOut } from "lucide-react";
+import { Toaster } from "./components/ui/sonner";
+import { toast } from "sonner";
+import { projectApi } from "./services/projectService";
+import { evaluationApi } from "./services/evaluationApi";
+import { authApi } from "./services/positionApi";
+
+export type UserRole = "admin" | "faculty" | "student";
+export type AssessorRole = "Supervisor" | "Co-Supervisor" | "ST" | "RA" | "TA" | "External Examiner";
+export type EvaluationStatus = "Pending" | "Submitted";
+
+export interface Project {
+  id: string;
+  title: string;
+  studentName: string;
+  studentId: string;
+  description: string;
+  department: string;
+  status: "Planning" | "In Progress" | "Review" | "Completed";
+  startDate: string;
+  endDate: string;
+  supervisor: string;
+}
+
+export interface Criterion {
+  name: string;
+  maxScore: number;
+  score?: number;
+  comment?: string;
+}
+
+export interface Evaluation {
+  id: string;
+  projectId: string;
+  assessorId: string;
+  assessorName: string;
+  assessorRole: AssessorRole;
+  criteria: Criterion[];
+  finalComment: string;
+  totalScore: number;
+  submittedAt?: Date;
+  status: EvaluationStatus;
+}
+
+export type PageView = "dashboard" | "projects" | "project-details" | "reservations" | "users";
+
+export interface Reservation {
+  id: string;
+  type: "desk" | "lab" | "meeting-room";
+  resourceName: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  userName: string;
+  userType: "faculty" | "student";
+  purpose?: string;
+}
+
+export interface Position {
+  id: string;
+  type: "ST" | "RA" | "TA";
+  title: string;
+  department: string;
+  course?: string;
+  faculty: string;
+  description: string;
+  requirements: string[];
+  hoursPerWeek: number;
+  payRate: string;
+  startDate: string;
+  endDate: string;
+  spots: number;
+  filled: number;
+}
+
+export interface Application {
+  id: string;
+  positionId: string;
+  studentName: string;
+  email: string;
+  studentId: string;
+  gpa: string;
+  expertise: string[];
+  availability: string;
+  experience: string;
+  coverLetter: string;
+  status: "pending" | "accepted" | "rejected";
+  appliedDate: string;
+}
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState<PageView>("dashboard");
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<UserRole>(() => {
+    // Demo mode - load role from localStorage or default to student
+    const savedRole = localStorage.getItem("userRole");
+    return (savedRole as UserRole) || "student";
+  });
+  const [currentUserId] = useState("demo-faculty-user");
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [currentUser, setCurrentUser] = useState<{ name: string; id: string; email: string; role: string } | null>(null);
+  // Demo mode - no authentication required
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [reservations, setReservations] = useState<Reservation[]>([
+    {
+      id: "1",
+      type: "desk",
+      resourceName: "Desk A-12",
+      date: "2025-12-25",
+      startTime: "09:00",
+      endTime: "11:00",
+      userName: "Rafsan Rahman",
+      userType: "student",
+      purpose: "Study session"
+    },
+    {
+      id: "2",
+      type: "lab",
+      resourceName: "Computer Lab 1",
+      date: "2025-12-26",
+      startTime: "14:00",
+      endTime: "16:00",
+      userName: "Dr. Shah Alam",
+      userType: "faculty",
+      purpose: "Programming workshop"
+    },
+    {
+      id: "3",
+      type: "meeting-room",
+      resourceName: "Conference Room",
+      date: "2025-12-27",
+      startTime: "10:00",
+      endTime: "12:00",
+      userName: "Dr. Sarah Johnson",
+      userType: "faculty",
+      purpose: "Team meeting"
+    }
+  ]);
+
+  const [positions, setPositions] = useState<Position[]>([
+    {
+      id: "1",
+      type: "TA",
+      title: "Teaching Assistant - Data Structures",
+      department: "Computer Science",
+      course: "CS 201",
+      faculty: "Md. Rifat Alam Pomil ",
+      description: "Assist in teaching Data Structures course, hold office hours, grade assignments",
+      requirements: ["GPA 3.5+", "Completed CS 201 with A or A+", "Good communication skills"],
+      hoursPerWeek: 10,
+      payRate: "$25/hour",
+      startDate: "2025-12-01",
+      endDate: "2026-05-15",
+      spots: 2,
+      filled: 0
+    },
+    {
+      id: "2",
+      type: "RA",
+      title: "Research Assistant - Machine Learning Lab",
+      department: "Computer Science",
+      faculty: "Annajiat Alam Rasel",
+      description: "Assist with ML research projects, data collection, and analysis",
+      requirements: ["Python programming", "Knowledge of ML algorithms", "GPA 3.0+"],
+      hoursPerWeek: 15,
+      payRate: "$18/hour",
+      startDate: "2025-11-20",
+      endDate: "2026-08-01",
+      spots: 3,
+      filled: 1
+    },
+    {
+      id: "3",
+      type: "ST",
+      title: "Student Tutor - Mathematics",
+      department: "Mathematics",
+      faculty: "Academic Support Center",
+      description: "Provide one-on-one and group tutoring for calculus and algebra students",
+      requirements: ["Math major or minor", "GPA 3.2+", "Patient and helpful"],
+      hoursPerWeek: 8,
+      payRate: "$12/hour",
+      startDate: "2025-11-25",
+      endDate: "2026-05-30",
+      spots: 5,
+      filled: 2
+    }
+  ]);
+
+  const [applications, setApplications] = useState<Application[]>([
+    {
+      id: "1",
+      positionId: "1",
+      studentName: "Rafsan Rahman",
+      email: "rafsan.rahman@university.edu",
+      studentId: "22201972",
+      gpa: "3.0",
+      expertise: ["Data Structures", "Algorithms", "Typescript", "Python"],
+      availability: "Monday-Friday, 2-6 PM",
+      experience: "Tutored peers in CS courses for 1 year",
+      coverLetter: "I am very interested in this TA position...",
+      status: "pending",
+      appliedDate: "2025-11-15"
+    }
+  ]);
+
+  const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
+
+  // Demo mode - role switching
+  const handleRoleChange = (newRole: UserRole) => {
+    setUserRole(newRole);
+    localStorage.setItem("userRole", newRole);
+    console.log('DEMO MODE - Switched to role:', newRole);
+    // Refresh projects when role changes
+    if (isAuthenticated && !isLoading) {
+      refreshMyProjects();
+    }
+  };
+
+  const loadEvaluations = async () => {
+    try {
+      console.log('📥 Loading evaluations from MongoDB');
+      const evaluationsData = await evaluationApi.list();
+      const mappedEvaluations: Evaluation[] = evaluationsData.map((e: any) => ({
+        id: e._id,
+        projectId: e.projectId,
+        assessorId: e.assessorId,
+        assessorName: e.assessorName,
+        assessorRole: e.assessorRole,
+        criteria: e.criteria,
+        finalComment: e.finalComment,
+        totalScore: e.totalScore,
+        status: e.status,
+        submittedAt: e.submittedAt,
+        createdAt: e.createdAt,
+        updatedAt: e.updatedAt,
+      }));
+      setEvaluations(mappedEvaluations);
+      console.log('✅ Loaded evaluations:', mappedEvaluations.length);
+    } catch (error: any) {
+      console.error('Error loading evaluations:', error);
+      toast.error('Failed to load evaluations');
+    }
+  };
+
+  const addReservation = (reservation: Omit<Reservation, "id">) => {
+    const newReservation = {
+      ...reservation,
+      id: Date.now().toString()
+    };
+    setReservations([...reservations, newReservation]);
+    toast.success("Reservation added successfully!");
+  };
+
+  const cancelReservation = (id: string) => {
+    setReservations(reservations.filter(r => r.id !== id));
+    toast.success("Reservation cancelled successfully!");
+  };
+
+  const addApplication = (application: Omit<Application, "id" | "appliedDate" | "status">) => {
+    const newApplication: Application = {
+      ...application,
+      id: Date.now().toString(),
+      status: "pending",
+      appliedDate: new Date().toISOString().split('T')[0]
+    };
+    setApplications([...applications, newApplication]);
+    toast.success("Application submitted successfully!");
+  };
+
+  const updateApplication = (id: string, status: "accepted" | "rejected", reason?: string) => {
+    setApplications(applications.map(app =>
+      app.id === id
+        ? { ...app, status, updated_at: new Date().toISOString() }
+        : app
+    ));
+    toast.success(`Application ${status} successfully!`);
+  };
+
+  const handleAssignEvaluation = async (project: Project) => {
+    try {
+      console.log('🎯 Assigning evaluation for project:', project.title);
+
+      // Create evaluation assignment in MongoDB
+      const evaluationData = {
+        projectId: project.id,
+        assessorRole: 'Supervisor',
+        assessorName: currentUser?.name || 'Demo Faculty'
+      };
+
+      const newEvaluation = await evaluationApi.create(evaluationData);
+
+      // Add to local state
+      const evaluation: Evaluation = {
+        id: newEvaluation._id,
+        projectId: project.id,
+        assessorId: newEvaluation.assessorId,
+        assessorName: newEvaluation.assessorName,
+        assessorRole: newEvaluation.assessorRole as AssessorRole,
+        criteria: newEvaluation.criteria,
+        finalComment: newEvaluation.finalComment,
+        totalScore: newEvaluation.totalScore,
+        status: newEvaluation.status,
+        submittedAt: newEvaluation.submittedAt ? new Date(newEvaluation.submittedAt) : undefined,
+        createdAt: newEvaluation.createdAt,
+        updatedAt: newEvaluation.updatedAt,
+      };
+
+      setEvaluations(prev => [...prev, evaluation]);
+      toast.success(`Successfully assigned to evaluate "${project.title}"`);
+    } catch (error: any) {
+      console.error('Error assigning evaluation:', error);
+      toast.error(error.response?.data?.error || 'Failed to assign evaluation');
+    }
+  };
+
+  // Legacy function for backward compatibility with ProjectDetails
+  const handleAssignEvaluationLegacy = (projectId: string, facultyName: string, facultyId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      handleAssignEvaluation(project);
+    }
+  };
+    setEvaluations([...evaluations, newEvaluation]);
+  };
+
+
+  const handleNavigate = (page: PageView) => {
+    setCurrentPage(page);
+    if (page !== "project-details") {
+      setSelectedProjectId(null);
+    }
+  };
+
+  const handleViewProject = (projectId: string) => {
+    setSelectedProjectId(projectId);
+    setCurrentPage("project-details");
+  };
+
+  const handleBackToProjects = () => {
+    setSelectedProjectId(null);
+    setCurrentPage("projects");
+  };
+
+  const refreshMyProjects = async () => {
+    try {
+      let response;
+      if (userRole === 'student') {
+        response = await projectApi.listMyProjects();
+      } else {
+        // Admin/faculty can see all projects
+        response = await projectApi.listAllProjects();
+      }
+
+      const mappedProjects: Project[] = response.map((p: any) => ({
+        id: p._id,
+        title: p.title,
+        // Handle both old format (studentName) and new format (student.name)
+        studentName: p.studentName || (p.student?.name) || 'Unknown Student',
+        studentId: p.studentId,
+        description: p.description,
+        department: p.department,
+        status: p.status === 'SUBMITTED' ? 'Planning' : p.status === 'IN_REVIEW' ? 'In Progress' : p.status === 'EVALUATED' ? 'Completed' : 'Planning',
+        startDate: p.startDate,
+        endDate: p.expectedEndDate,
+        supervisor: p.supervisorName,
+      }));
+      setProjects(mappedProjects);
+    } catch (error: any) {
+      console.error('Error loading projects:', error);
+      toast.error('Failed to load projects from MongoDB');
+    }
+  };
+
+
+
+  // Demo mode - set up user
+  useEffect(() => {
+    setCurrentUser({
+      name: userRole === 'admin' ? 'Admin' : userRole === 'faculty' ? 'Faculty' : 'Student',
+      id: 'demo-user-1',
+      email: 'demo@university.edu',
+      role: userRole.toUpperCase()
+    });
+    console.log('DEMO MODE - Using user with role:', userRole);
+    setIsLoading(false);
+  }, [userRole]);
+
+  // Load projects and evaluations when authenticated
+  useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      refreshMyProjects();
+      loadEvaluations();
+    }
+  }, [isAuthenticated, isLoading, userRole]);
+
+  const renderReservations = () => {
+    return (
+      <Tabs defaultValue="reservation" className="space-y-6">
+      <TabsList className="flex w-full gap-2 overflow-x-auto rounded-full bg-muted p-1">
+        <TabsTrigger value="desks" className="flex items-center gap-2 px-3 py-2 text-sm font-medium shrink-0">
+          <BookOpen className="size-4" />
+          <span className="hidden sm:inline">Desks</span>
+        </TabsTrigger>
+        <TabsTrigger value="labs" className="flex items-center gap-2 px-3 py-2 text-sm font-medium shrink-0">
+          <MonitorSmartphone className="size-4" />
+          <span className="hidden sm:inline">Labs</span>
+        </TabsTrigger>
+        <TabsTrigger value="meeting-rooms" className="flex items-center gap-2 px-3 py-2 text-sm font-medium shrink-0">
+          <Users className="size-4" />
+          <span className="hidden sm:inline">Meeting Rooms</span>
+        </TabsTrigger>
+        <TabsTrigger value="reservation" className="flex items-center gap-2 px-3 py-2 text-sm font-medium shrink-0">
+          <Building className="size-4" />
+          <span className="hidden sm:inline">Reservation</span>
+        </TabsTrigger>
+        <TabsTrigger value="my-reservations" className="flex items-center gap-2 px-3 py-2 text-sm font-medium shrink-0">
+          <Calendar className="size-4" />
+          <span className="hidden sm:inline">My Bookings</span>
+        </TabsTrigger>
+        <TabsTrigger value="positions" className="flex items-center gap-2 px-3 py-2 text-sm font-medium shrink-0">
+          <Briefcase className="size-4" />
+          <span className="hidden sm:inline">Positions</span>
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="desks" className="space-y-6">
+        <DeskReservation 
+          reservations={reservations.filter(r => r.type === "desk")}
+          onReserve={addReservation}
+        />
+      </TabsContent>
+
+      <TabsContent value="labs" className="space-y-6">
+        <LabAvailability 
+          reservations={reservations.filter(r => r.type === "lab")}
+          onReserve={addReservation}
+        />
+      </TabsContent>
+
+      <TabsContent value="meeting-rooms" className="space-y-6">
+        <MeetingRoomReservation
+          reservations={reservations.filter(r => r.type === "meeting-room")}
+          onReserve={addReservation}
+        />
+      </TabsContent>
+
+      <TabsContent value="reservation" className="space-y-6">
+        <Reservation
+          reservations={reservations}
+          onReserve={addReservation}
+        />
+      </TabsContent>
+
+      <TabsContent value="my-reservations" className="space-y-6">
+        <MyReservations 
+          reservations={reservations}
+          onCancel={cancelReservation}
+        />
+      </TabsContent>
+
+      <TabsContent value="positions" className="space-y-6">
+        <PositionApplications
+          studentId={userRole === "student" ? "22201972" : undefined}
+          positions={positions}
+          applications={applications}
+          onApply={addApplication}
+          onUpdateApplication={updateApplication}
+          userRole={userRole}
+        />
+      </TabsContent>
+    </Tabs>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Demo mode - show loading spinner while setting up */}
+      {isLoading ? (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center w-full">
+          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <>
+          <Sidebar currentPage={currentPage} userRole={userRole} onNavigate={handleNavigate} />
+
+          <div className="flex-1 flex flex-col">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-gray-900">Campus Management System</h1>
+                <p className="text-gray-600 text-sm mt-1">
+                  Room Reservation & Academic Project Management
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                {/* Demo Mode - Role Switching */}
+                <div className="flex items-center gap-3 px-4 py-2 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm">
+                      {userRole === "admin" ? "AD" : userRole === "faculty" ? "FA" : "ST"}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-900">
+                      {currentUser?.name || "Demo User"}
+                    </p>
+                    <p className="text-xs text-gray-600 capitalize">{userRole}</p>
+                  </div>
+                </div>
+
+                {/* Role Switcher */}
+                <div className="flex gap-2">
+                  {(['student', 'faculty', 'admin'] as UserRole[]).map((role) => (
+                    <button
+                      key={role}
+                      onClick={() => handleRoleChange(role)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        userRole === role
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-blue-600 border border-blue-300 hover:bg-blue-50'
+                      }`}
+                    >
+                      {role === 'admin' ? 'Admin' : role === 'faculty' ? 'Faculty' : 'Student'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-auto">
+          <div className="p-6">
+            {currentPage === "dashboard" && (
+              <Dashboard
+                userRole={userRole}
+                onNavigate={handleNavigate}
+                onViewProject={handleViewProject}
+                projects={projects}
+                evaluations={evaluations}
+              />
+            )}
+            {currentPage === "projects" && (
+              <ProjectsList
+                userRole={userRole}
+                onViewProject={handleViewProject}
+                projects={projects}
+                evaluations={evaluations}
+                onProjectCreated={refreshMyProjects}
+                onAssignEvaluation={handleAssignEvaluation}
+                studentName={currentUser?.name || ""}
+              />
+            )}
+            {currentPage === "project-details" && selectedProjectId && (
+              <ProjectDetails
+                projectId={selectedProjectId}
+                userRole={userRole}
+                currentUserId={currentUserId}
+                onBack={handleBackToProjects}
+                projects={projects}
+                evaluations={evaluations}
+                onSubmitEvaluation={(evaluation) => {
+                  setEvaluations([...evaluations, evaluation]);
+                }}
+                onAssignEvaluation={handleAssignEvaluationLegacy}
+              />
+            )}
+            {currentPage === "reservations" && renderReservations()}
+            {currentPage === "users" && <div>User Management</div>}
+          </div>
+        </main>
+      </div>
+      <Toaster />
+        </>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,455 @@
+/* ============================================================
+   APCMS PREMIUM DESIGN SYSTEM
+   Modern Academic SaaS — Notion meets Linear
+   ============================================================ */
+
+/* --- FONTS --- */
+:root {
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Space Grotesk', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Accent palette */
+  --green:       #22c55e;
+  --green-dim:   rgba(34, 197, 94, 0.15);
+  --green-glow:  rgba(34, 197, 94, 0.45);
+  --rose:        #f43f5e;
+  --rose-dim:    rgba(244, 63, 94, 0.15);
+  --rose-glow:   rgba(244, 63, 94, 0.45);
+  --amber:       #f59e0b;
+  --amber-dim:   rgba(245, 158, 11, 0.15);
+  --amber-glow:  rgba(245, 158, 11, 0.45);
+
+  /* Base */
+  --base-bg:     #0f1117;
+  --surface:     #161b27;
+  --surface-2:   #1e2535;
+  --border-subtle: rgba(255,255,255,0.07);
+  --text-primary: #f1f5f9;
+  --text-muted:   #94a3b8;
+}
+
+/* --- GLOBAL BODY --- */
+html, body {
+  font-family: var(--font-body);
+  background-color: var(--base-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   KEYFRAME ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes ping-ring {
+  75%, 100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes pulse-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+  50%       { box-shadow: 0 0 12px 4px rgba(245,158,11,0.25); }
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244,63,94,0.4); }
+  50%       { box-shadow: 0 0 12px 4px rgba(244,63,94,0.25); }
+}
+
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+@keyframes spin-green {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   PAGE LOAD — STAGGER FADE-UP
+   ============================================================ */
+.apcms-page > *,
+.apcms-stagger > * {
+  animation: fadeUp 0.4s ease forwards;
+  opacity: 0;
+}
+.apcms-page > *:nth-child(1), .apcms-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.apcms-page > *:nth-child(2), .apcms-stagger > *:nth-child(2) { animation-delay: 80ms; }
+.apcms-page > *:nth-child(3), .apcms-stagger > *:nth-child(3) { animation-delay: 160ms; }
+.apcms-page > *:nth-child(4), .apcms-stagger > *:nth-child(4) { animation-delay: 240ms; }
+.apcms-page > *:nth-child(5), .apcms-stagger > *:nth-child(5) { animation-delay: 320ms; }
+.apcms-page > *:nth-child(6), .apcms-stagger > *:nth-child(6) { animation-delay: 400ms; }
+
+/* ============================================================
+   SIDEBAR OVERRIDES
+   ============================================================ */
+aside {
+  background: linear-gradient(180deg, #0d1220 0%, #111827 50%, #0d1220 100%) !important;
+  border-right: 1px solid var(--border-subtle) !important;
+}
+
+/* Active nav item — glowing green left border */
+aside button.border-l-4 {
+  border-left: 3px solid var(--green) !important;
+  background: linear-gradient(90deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04)) !important;
+  color: #fff !important;
+  box-shadow: inset 0 0 20px rgba(34,197,94,0.06) !important;
+}
+
+/* Inactive nav hover */
+aside button:not(.border-l-4):hover {
+  background: rgba(255,255,255,0.05) !important;
+  color: #fff !important;
+}
+
+aside button {
+  transition: all 0.18s ease !important;
+  border-radius: 8px !important;
+}
+
+/* ============================================================
+   CARDS & PANELS — GLASSMORPHISM
+   ============================================================ */
+
+/* Target all white/surface cards */
+.bg-white,
+[class*="bg-white"],
+.rounded-lg.border {
+  background: var(--surface) !important;
+  border: 1px solid var(--border-subtle) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  color: var(--text-primary) !important;
+  transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+}
+
+.rounded-lg.border:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4) !important;
+}
+
+/* Dashboard stat cards get a subtle accent top-border */
+.grid > .rounded-lg.border:nth-child(1) { border-top: 2px solid var(--green) !important; }
+.grid > .rounded-lg.border:nth-child(2) { border-top: 2px solid var(--rose) !important; }
+.grid > .rounded-lg.border:nth-child(3) { border-top: 2px solid var(--amber) !important; }
+.grid > .rounded-lg.border:nth-child(4) { border-top: 2px solid #818cf8 !important; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+/* Base button transitions */
+button, .btn {
+  transition: all 0.2s ease !important;
+}
+
+/* Green / primary CTA buttons */
+.bg-blue-600,
+[class*="bg-blue-6"],
+[class*="bg-blue-7"],
+button[class*="bg-blue"] {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+  border: none !important;
+  color: #fff !important;
+}
+.bg-blue-600:hover,
+[class*="bg-blue-6"]:hover,
+button[class*="bg-blue"]:hover {
+  box-shadow: 0 0 18px rgba(37,99,235,0.55) !important;
+  transform: scale(1.03) translateY(-1px) !important;
+}
+
+/* Any explicitly green button */
+.bg-green-600, [class*="bg-green-6"], [class*="bg-green-5"] {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  color: #fff !important;
+  border: none !important;
+}
+.bg-green-600:hover, [class*="bg-green-6"]:hover, [class*="bg-green-5"]:hover {
+  box-shadow: 0 0 18px var(--green-glow) !important;
+  transform: scale(1.03) translateY(-1px) !important;
+}
+
+/* Red / danger / rose buttons */
+.bg-red-600, [class*="bg-red-6"], [class*="bg-red-5"],
+button.text-red-600, .text-red-600 {
+  color: var(--rose) !important;
+}
+button[class*="bg-red"]:hover {
+  box-shadow: 0 0 18px var(--rose-glow) !important;
+  transform: scale(1.03) !important;
+}
+
+/* Outline / ghost buttons */
+button[class*="border"]:not([class*="bg-"]) {
+  border-color: var(--border-subtle) !important;
+  color: var(--text-primary) !important;
+  background: rgba(255,255,255,0.04) !important;
+}
+button[class*="border"]:not([class*="bg-"]):hover {
+  background: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.18) !important;
+}
+
+/* ============================================================
+   FORM INPUTS — GREEN FOCUS GLOW
+   ============================================================ */
+input, select, textarea {
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: var(--green) !important;
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.25) !important;
+}
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* ============================================================
+   TABLES — HOVER HIGHLIGHTS & ROW ACTIONS
+   ============================================================ */
+table {
+  background: var(--surface) !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+thead {
+  background: rgba(255,255,255,0.04) !important;
+}
+thead th {
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  font-size: 0.72rem !important;
+}
+tbody tr {
+  transition: background 0.15s ease !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+tbody tr:hover {
+  background: rgba(255,255,255,0.04) !important;
+}
+
+/* Row action buttons appear on hover */
+tbody tr td button,
+tbody tr td a {
+  opacity: 0.4;
+  transition: opacity 0.15s ease, color 0.15s ease !important;
+}
+tbody tr:hover td button,
+tbody tr:hover td a {
+  opacity: 1;
+}
+
+/* ============================================================
+   BADGES & STATUS INDICATORS
+   ============================================================ */
+.badge-green, [class*="bg-green-100"] {
+  background: var(--green-dim) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(34,197,94,0.25) !important;
+  box-shadow: 0 0 8px rgba(34,197,94,0.2) !important;
+}
+.badge-rose, [class*="bg-red-100"] {
+  background: var(--rose-dim) !important;
+  color: #fb7185 !important;
+  border: 1px solid rgba(244,63,94,0.25) !important;
+  box-shadow: 0 0 8px rgba(244,63,94,0.2) !important;
+}
+.badge-amber, [class*="bg-yellow-100"], [class*="bg-amber-100"] {
+  background: var(--amber-dim) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245,158,11,0.25) !important;
+  box-shadow: 0 0 8px rgba(245,158,11,0.2) !important;
+}
+.badge-purple, [class*="bg-purple-100"] {
+  background: rgba(139,92,246,0.15) !important;
+  color: #a78bfa !important;
+  border: 1px solid rgba(139,92,246,0.25) !important;
+}
+
+/* ============================================================
+   PROGRESS BARS — ANIMATED FILL
+   ============================================================ */
+[role="progressbar"] > div,
+.progress-bar,
+div[class*="bg-blue-6"][style*="width"],
+div[class*="bg-green-6"][style*="width"] {
+  animation: progress-fill 0.8s cubic-bezier(0.4,0,0.2,1) forwards !important;
+  background: linear-gradient(90deg, var(--green), #4ade80) !important;
+  box-shadow: 0 0 10px var(--green-glow) !important;
+  border-radius: 999px !important;
+}
+
+/* ============================================================
+   NOTIFICATION BADGE — PING RING
+   ============================================================ */
+.notification-badge,
+span[class*="rounded-full"][class*="bg-red"] {
+  position: relative !important;
+}
+.notification-badge::after,
+span[class*="rounded-full"][class*="bg-red"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--rose);
+  animation: ping-ring 1.5s cubic-bezier(0,0,0.2,1) infinite;
+}
+
+/* ============================================================
+   DEADLINE / CALENDAR STATUS ITEMS
+   ============================================================ */
+.deadline-soon {
+  animation: pulse-amber 2s ease-in-out infinite !important;
+}
+.deadline-overdue {
+  animation: pulse-red 2s ease-in-out infinite !important;
+  color: var(--rose) !important;
+}
+
+/* ============================================================
+   LOADING SPINNER
+   ============================================================ */
+.spinner,
+[class*="animate-spin"] {
+  border-color: rgba(34,197,94,0.2) !important;
+  border-top-color: var(--green) !important;
+  animation: spin-green 0.7s linear infinite !important;
+}
+
+/* ============================================================
+   MODAL / DIALOG BACKGROUNDS
+   ============================================================ */
+[role="dialog"],
+.dialog-content,
+[class*="DialogContent"] {
+  background: #161b27 !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.7) !important;
+}
+
+/* Dialog overlay darkening */
+[data-radix-dialog-overlay],
+[class*="DialogOverlay"] {
+  background: rgba(0,0,0,0.75) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* ============================================================
+   TEXT COLOR OVERRIDES
+   ============================================================ */
+.text-gray-900, [class*="text-gray-9"] { color: var(--text-primary) !important; }
+.text-gray-600, [class*="text-gray-6"], .text-gray-500 { color: var(--text-muted) !important; }
+.text-gray-700 { color: #cbd5e1 !important; }
+
+/* ============================================================
+   HEADER BAR
+   ============================================================ */
+header {
+  background: rgba(15,17,23,0.85) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+[role="tablist"] {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 10px !important;
+  padding: 4px !important;
+}
+[role="tab"][data-state="active"],
+[role="tab"][aria-selected="true"] {
+  background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.08)) !important;
+  color: var(--green) !important;
+  border: 1px solid rgba(34,197,94,0.3) !important;
+  box-shadow: 0 0 12px rgba(34,197,94,0.15) !important;
+}
+
+/* ============================================================
+   SELECT DROPDOWNS
+   ============================================================ */
+[role="listbox"],
+[data-radix-popper-content-wrapper] > div {
+  background: #1a2032 !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6) !important;
+}
+[role="option"]:hover,
+[role="option"][data-highlighted] {
+  background: rgba(34,197,94,0.1) !important;
+  color: var(--green) !important;
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS — SLIDE IN FROM TOP-RIGHT
+   ============================================================ */
+[data-sonner-toaster],
+[class*="Toaster"] {
+  top: 16px !important;
+  right: 16px !important;
+}
+[data-sonner-toast] {
+  animation: slideInRight 0.3s ease forwards !important;
+  background: #1e2535 !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+
+/* ============================================================
+   SCROLLBAR — MINIMAL DARK STYLE
+   ============================================================ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34,197,94,0.4);
+}
+
+/* ============================================================
+   UTILITY HELPERS
+   ============================================================ */
+.glow-green { box-shadow: 0 0 16px var(--green-glow) !important; }
+.glow-rose  { box-shadow: 0 0 16px var(--rose-glow) !important; }
+
+/* Main content area background */
+main {
+  background: var(--base-bg) !important;
+}
+.min-h-screen.bg-gray-50,
+.bg-gray-50 {
+  background: var(--base-bg) !important;
+}
