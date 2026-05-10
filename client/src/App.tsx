@@ -25,7 +25,11 @@ import { PositionApplications } from "./components/PositionApplications";
 import { BookOpen, Briefcase, Building, Calendar, MonitorSmartphone, Users, LogOut } from "lucide-react";
 import { ModeToggle } from "./components/mode-toggle";
 import { Login } from "./components/Login";
-
+import StagesPage from './pages/ProjectTracking/StagesPage'
+import SubmitWorkPage from './pages/ProjectTracking/SubmitWorkPage'
+import GradingPage from './pages/ProjectTracking/GradingPage'
+import PeerReviewPage from './pages/ProjectTracking/PeerReviewPage'
+import ResubmissionPage from './pages/ProjectTracking/ResubmissionPage'
 export type UserRole = "admin" | "faculty" | "student";
 export type AssessorRole = "Supervisor" | "Co-Supervisor" | "ST" | "RA" | "TA" | "External Examiner";
 export type EvaluationStatus = "Pending" | "Submitted";
@@ -78,7 +82,7 @@ export interface Reservation {
   purpose: string;
 }
 
-export type PageView = "dashboard" | "projects" | "project-details" | "reservations" | "positions" | "users" | "supervisor-management" | "supervisor-availability" | "evaluation-summary";
+export type PageView = "dashboard" | "projects" | "project-details" | "reservations" | "positions" | "users" | "supervisor-management" | "supervisor-availability" | "evaluation-summary" | "stage-management" | "submit-work" | "grading" | "peer-review" | "resubmission";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => !!localStorage.getItem("token"));
@@ -456,6 +460,21 @@ export default function App() {
               evaluations={evaluations}
               onBack={handleBackToProjects}
             />
+          )}
+          {currentPage === "stage-management" && (
+            <StagesPage />
+          )}
+          {currentPage === "submit-work" && (
+            <SubmitWorkPage />
+          )}
+          {currentPage === "grading" && (
+            <GradingPage />
+          )}
+          {currentPage === "peer-review" && (
+            <PeerReviewPage />
+          )}
+          {currentPage === "resubmission" && (
+            <ResubmissionPage />
           )}
           {currentPage === "positions" && (
             <PositionApplications

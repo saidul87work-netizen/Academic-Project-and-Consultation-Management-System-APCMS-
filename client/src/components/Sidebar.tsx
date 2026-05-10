@@ -58,6 +58,36 @@ export function Sidebar({ currentPage, userRole, onNavigate }: SidebarProps) {
       icon: <Clock className="w-5 h-5" />,
       roles: ['faculty'],
     },
+    {
+      id: 'stage-management',
+      label: 'Stage Management',
+      icon: <FolderKanban className="w-5 h-5" />,
+      roles: ['admin', 'faculty', 'student'],
+    },
+    {
+      id: 'submit-work',
+      label: 'Submit Work',
+      icon: <FileText className="w-5 h-5" />,
+      roles: ['student'],
+    },
+    {
+      id: 'grading',
+      label: 'Grading Panel',
+      icon: <UserCheck className="w-5 h-5" />,
+      roles: ['admin', 'faculty'],
+    },
+    {
+      id: 'peer-review',
+      label: 'Peer Review',
+      icon: <Users className="w-5 h-5" />,
+      roles: ['student'],
+    },
+    {
+      id: 'resubmission',
+      label: 'Resubmission',
+      icon: <Briefcase className="w-5 h-5" />,
+      roles: ['admin', 'faculty', 'student'],
+    },
   ];
 
   const filteredNavItems = navItems.filter((item) => item.roles.includes(userRole));
